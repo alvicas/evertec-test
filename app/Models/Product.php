@@ -28,6 +28,13 @@ class Product extends Model
     protected $casts = [
         'price' => 'double',
     ];
+
+    /**
+     * log changes to all the $fillable attributes
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\belongsTo
+     */
+    protected static $logFillable = true;
     
     /**
      * product

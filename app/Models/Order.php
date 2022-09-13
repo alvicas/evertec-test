@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     //Available status for an order
     const STATUS_CREATED = "CREATED";
@@ -41,6 +42,12 @@ class Order extends Model
         'payment_date' => 'datetime:Y-m-d H:i:s',
     ];
 
+    /**
+     * log changes to all the $fillable attributes
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\belongsTo
+     */
+    protected static $logFillable = true;
 
     /**
      * product
