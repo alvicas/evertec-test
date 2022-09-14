@@ -42,11 +42,11 @@ class Order extends Model
         'payment_date' => 'datetime:Y-m-d H:i:s',
     ];
 
-    /**
-     * log changes to all the $fillable attributes
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsTo
-     */
+     /**
+      * this flag indicate to create log changes for all the $fillable attributes
+      *
+      * @var boolean
+      */
     protected static $logFillable = true;
 
     /**
