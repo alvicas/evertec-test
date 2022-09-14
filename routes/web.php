@@ -17,8 +17,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/products', 'Web\ProductIndexController@index')->name('product.index');
-Route::get('/product/{id}', 'Web\ProductShowController@show')->name('product.show');
+//Product
+Route::get('/products', 'Product\ProductIndexController@index')->name('product.index');
+Route::get('/product/{id}', 'Product\ProductShowController@show')->name('product.show');
+
+//Order
+Route::post('/order', 'Order\OrderCreateController@create')->name('order.create');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

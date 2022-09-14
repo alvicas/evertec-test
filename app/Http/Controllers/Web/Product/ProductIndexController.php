@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers\Web\Product;
 
 use App\Models\Product;
-use App\Traits\ApiResponser;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 

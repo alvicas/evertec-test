@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -25,9 +26,12 @@ class Order extends Model
         'customer_name',
         'customer_email',
         'customer_mobile',
+        'customer_document_number',
+        'customer_document_type',
         'status',
         'product_id',
         'identifier_code',
+        'total',
         'payment_url',
         'payment_session',
         'payment_date'
@@ -48,6 +52,72 @@ class Order extends Model
       * @var boolean
       */
     protected static $logFillable = true;
+
+    /**
+     * setDataCreate
+     *
+     * @return array
+     */
+    public function createData(array $attributes): array
+    {
+        return [
+            'customer_name' => $attributes['customer_name'],
+            'customer_email' => $attributes['customer_email'],
+            'customer_mobile' => $attributes['customer_mobile'],
+            'customer_document_number' => $attributes['customer_document_number'],
+            'customer_document_type' => $attributes['customer_document_type'],
+            'product_id' => $attributes['product_id'],
+            'identifier_code' => $this->getIdentifierCode(),
+            'total' => $attributes['total'],
+            'status' => Order::STATUS_CREATED
+        ];
+    }
+    
+    /**
+     * getProductsPaginated
+     *
+     * @return void
+     */
+    public function getProductsPaginated()
+    {
+        return $this::paginate(10);
+    }
+    
+    /**
+     * getIdentifierCode
+     *
+     * @return string
+     */
+    public function getIdentifierCode(): string
+    {
+        $randomCode = Str::random(10);
+        while ($this->where('identifier_code', $randomCode)->exists()) {
+            $randomCode = Str::random(10);
+        }
+        return $randomCode;
+    }
+    
+    /**
+     * getCustomerFirstName
+     *
+     * @return string
+     */
+    public function getCustomerFirstName(): string
+    {
+        $splitName = explode(" ", $this->customer_name);
+        return $splitName[0];
+    }
+    
+    /**
+    * Undocumented function
+    *
+    * @return void
+    */
+    public function getCustomerSurName()
+    {
+        $splitName = explode(" ", $this->customer_name);
+        return isset($splitName[1]) ? $splitName[1] : null;
+    }
 
     /**
      * product

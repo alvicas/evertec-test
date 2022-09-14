@@ -232,4 +232,9 @@ return [
 
     ],
 
+    'placetoplay_url_base' => env('PLACETOPLAY_URL_BASE', null),
+    'placetoplay_secret_key' => env('PLACETOPLAY_SECRET_KEY', null),
+    'placetoplay_portal_id' => env('PLACETOPLAY_PORTAL_ID', null),
+    'placetoplay_url_checkout' => env('PLACETOPLAY_URL_CHEKOUT', null),
+
 ];
