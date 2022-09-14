@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -36,6 +38,28 @@ class Product extends Model
      */
     protected static $logFillable = true;
     
+    /**
+     * Undocumented function
+     *
+     * @param integer $id
+     * @return void
+     */
+    public function get(int $id)
+    {
+        return $this::find($id);
+    }
+    
+    
+    /**
+     * getProductsPaginated
+     *
+     * @return void
+     */
+    public function getProductsPaginated()
+    {
+        return $this::paginate(10);
+    }
+
     /**
      * product
      *

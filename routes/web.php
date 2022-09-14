@@ -17,6 +17,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/products', 'Web\ProductIndexController@index')->name('product.index');
+Route::get('/product/{id}', 'Web\ProductShowController@show')->name('product.show');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
