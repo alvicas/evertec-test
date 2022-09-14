@@ -28,13 +28,7 @@ trait ConsumesExternalServices
      * @var array
      */
     private $parameters = [];
-    
-    /**
-     * client
-     *
-     * @var Client
-     */
-    private $client;
+
 
 
     /**
@@ -42,9 +36,9 @@ trait ConsumesExternalServices
      *
      * @param Product $product
      */
-    public function __construct(Client $client)
+    public function __construct()
     {
-        $this->client = $client;
+       
     }
 
     /**
@@ -70,13 +64,15 @@ trait ConsumesExternalServices
     {
         $method = strtoupper($method);
         $this->setParameters($method, $headersData, $body, $auth, $verify);
+        dd($this->parameters,$url);
         try {
-            $response = $this->client->request($method, $url, $this->parameters);
+            $client = new Client;
+            $response = $client->request($method, $url, $this->parameters);
             $responseContent = json_decode($response->getBody()->getContents(), true);
             
             activity()
             ->withProperties([
-                'request' => json_encode($this->parameters),
+                'request' => $this->parameters,
                 'response' => $response->getBody()->getContents()
             ])
             ->log("request success from $serviceName");
@@ -86,7 +82,7 @@ trait ConsumesExternalServices
 
             activity()
             ->withProperties([
-                'request' => json_encode($this->parameters),
+                'request' => $this->parameters,
                 'response' => $exception->getMessage()
             ])
             ->log("request error from $serviceName");
