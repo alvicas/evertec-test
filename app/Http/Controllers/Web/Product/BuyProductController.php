@@ -6,7 +6,7 @@ use App\Models\Product;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 
-class ProductIndexController extends Controller
+class BuyProductController extends Controller
 {
     /**
      * product
@@ -26,14 +26,15 @@ class ProductIndexController extends Controller
     }
 
     /**
-     * index function
+     * Undocumented function
      *
+     * @param Product $product
      * @return void
      */
-    public function index()
+    public function buyProduct(Product $product)
     {
         try {
-            return  $this->successResponse($this->product->getProductsPaginated());
+            return view('User/userPersonalInformation', compact('product'));
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

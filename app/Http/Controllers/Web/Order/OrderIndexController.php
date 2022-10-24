@@ -37,7 +37,5 @@ class OrderIndexController extends Controller
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
     }
-
 }

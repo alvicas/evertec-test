@@ -16,7 +16,13 @@ class Order extends Model
     const STATUS_CREATED = "CREATED";
     const STATUS_PAYED = "PAYED";
     const STATUS_REJECTED = "REJECTED";
-        
+    const CHECKOUT_STATUS_FAILED = "FAILED";
+    const CHECKOUT_STATUS_OK = "OK";
+    const PAYMENT_STATUS_PENDING = "PENDING";
+    const PAYMENT_STATUS_APPROVED = "APPROVED";
+    const PAYMENT_STATUS_REJECTED = "REJECTED";
+    const PAYMENT_STATUS_ERROR = "ERROR";
+
     /**
      * The attributes that are mass assignable.
      *
@@ -34,7 +40,9 @@ class Order extends Model
         'total',
         'payment_url',
         'payment_session',
-        'payment_date'
+        'payment_date',
+        'payment_attempts',
+        'payment_status'
     ];
 
     /**
@@ -44,6 +52,7 @@ class Order extends Model
      */
     protected $casts = [
         'payment_date' => 'datetime:Y-m-d H:i:s',
+        'total' => 'integer',
     ];
 
      /**
@@ -69,7 +78,8 @@ class Order extends Model
             'product_id' => $attributes['product_id'],
             'identifier_code' => $this->getIdentifierCode(),
             'total' => $attributes['total'],
-            'status' => Order::STATUS_CREATED
+            'status' => Order::STATUS_CREATED,
+            'payment_status' => Order::PAYMENT_STATUS_PENDING,
         ];
     }
     
@@ -117,6 +127,58 @@ class Order extends Model
     {
         $splitName = explode(" ", $this->customer_name);
         return isset($splitName[1]) ? $splitName[1] : null;
+    }
+    
+    /**
+    * getStatus function
+    *
+    * @return void
+    */
+    public function getStatus()
+    {
+
+        switch ($this->status) {
+            case $this::STATUS_CREATED :
+                $status = 'Creado';
+                break;
+            case $this::STATUS_PAYED :
+                $status = 'Pagado';
+                break;
+            case $this::STATUS_REJECTED :
+                $status = 'Pago Rechazado';
+                break;
+            default:
+                $status = 'Creado';
+                break;
+        }
+
+        return $status;
+    }
+    
+    /**
+    * getStatus function
+    *
+    * @return void
+    */
+    public function getPaymentStatus()
+    {
+
+        switch ($this->payment_status) {
+            case $this::PAYMENT_STATUS_PENDING :
+                $status = 'Pendiente';
+                break;
+            case $this::PAYMENT_STATUS_APPROVED :
+                $status = 'Aprobado';
+                break;
+            case $this::PAYMENT_STATUS_REJECTED :
+                $status = 'Rechazado';
+                break;
+            default:
+                $status = 'Error en el pago';
+                break;
+        }
+
+        return $status;
     }
 
     /**
