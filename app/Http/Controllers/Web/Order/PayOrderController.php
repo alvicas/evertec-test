@@ -2,23 +2,15 @@
 
 namespace App\Http\Controllers\Web\Order;
 
-use DateTime;
 use App\Models\Order;
 use Illuminate\Http\Response;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\OrderCreateRequest;
 
-class OrderCreateController extends Controller
+class PayOrderController extends Controller
 {
-    /**
-     * product
-     *
-     * @param Order $order
-     */
-    protected $order;
-    
+
     /**
      * orderService
      *
@@ -38,23 +30,22 @@ class OrderCreateController extends Controller
     }
 
     /**
-     * index function
+     * payOrder
      *
+     * @param int $orderId
      * @return void
      */
-    public function Create(OrderCreateRequest $orderCreateRequest)
+    public function paymentAttemp(Order $order)
     {
         DB::beginTransaction();
         try {
-
-            $attributes = $orderCreateRequest->all();
-            $createData = $this->order->createData($attributes);
-            $this->order = $this->order->create($createData);
-
+            $sessionPaymentRequest = $this->orderService->createSessions($order);
+            $this->orderService->updateOrderByPaymentRequest($order, $sessionPaymentRequest);
+            
             DB::commit();
-
-            return $this->successResponse($this->order, 201);
+            return $this->successResponse($order, 201);
         } catch (\Exception $exception) {
+
             DB::rollBack();
             return $this->errorResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

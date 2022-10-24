@@ -5,8 +5,10 @@ namespace App\Services;
 
 use DateTime;
 use App\Models\Order;
-use App\Traits\ConsumesExternalServices;
+use Illuminate\Http\Response;
 use PhpParser\Node\Stmt\Return_;
+use App\Traits\ConsumesExternalServices;
+use Carbon\Carbon;
 
 class OrderService
 {
@@ -82,8 +84,9 @@ class OrderService
      */
     public function getTranKey(): string
     {
-        $seed = now()->format(DateTime::ISO8601);        
-        $sha = sha1($this->order->identifier.$seed.$this->placetoplaySecretKey);
+        $seed = now()->format(DateTime::ISO8601);
+        $tranKey = "$this->order->identifier_code.$seed.$this->placetoplaySecretKey";
+        $sha = sha1($tranKey);
         
         return base64_encode($sha);
     }
@@ -108,7 +111,7 @@ class OrderService
      *
      * @return array
      */
-    public function getUserrData(): array
+    public function getUserData(): array
     {
         $firtName = $this->order->getCustomerFirstName();
         $surname = $this->order->getCustomerSurName();
@@ -143,8 +146,8 @@ class OrderService
         return [
             'locale' => 'es_CO',
             'auth' => $this->getAuthData(),
-            'payer' => $this->getUserrData(),
-            'buyer' => $this->getUserrData(),
+            'payer' => $this->getUserData(),
+            'buyer' => $this->getUserData(),
             "payment" => [
                 'reference' => $this->order->identifier_code,
                 'description' => "Prueba de pago",
@@ -155,7 +158,7 @@ class OrderService
                     'details' => []
                 ],
                 'allowPartial' => false,
-                'shipping' => $this->getUserrData(),
+                'shipping' => $this->getUserData(),
                 'items' => [
                     [
                         'sku' => $this->order->identifier_code,
@@ -177,7 +180,7 @@ class OrderService
                           'currency' => "USD",
                           'total' => 200
                         ]
-                    ]  
+                    ]
                 ],
                 'modifiers' => [
                     [
@@ -185,7 +188,7 @@ class OrderService
                         'code' => 17934,
                         'additional' => [
                             'invoice' => "123345"
-                        ]                        
+                        ]
                     ]
                 ]
             ],
@@ -195,7 +198,7 @@ class OrderService
                     'keyword' => "_processUrl_",
                     'value' => "https://checkout.redirection.test/session/1/a592098e22acc709ec7eb30fc0973060",
                     'displayOn' => "none"
-                ]    
+                ]
             ],
             'paymentMethod' => "visa",
             'expiration' => "2019-08-24T14:15:22Z",
@@ -207,5 +210,37 @@ class OrderService
             'noBuyerFill' => false,
             'type' => "checkin"
         ];
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Order $order
+     * @param [type] $sessionPaymentRequest
+     * @return void
+     */
+    public function updateOrderByPaymentRequest(Order $order, $sessionPaymentRequest)
+    {
+        if (
+            $sessionPaymentRequest->status &&
+            isset($sessionPaymentRequest->status->status)  &&
+            $sessionPaymentRequest->status->status == Order::CHECKOUT_STATUS_OK
+        ) {
+            $dataToUpdate = [
+                'payment_session' => json_encode($sessionPaymentRequest),
+                'payment_url' => $sessionPaymentRequest->processUrl ?? null,
+                'payment_date' => new Carbon($sessionPaymentRequest->status->date) ?? null,
+                'payment_status' => Order::PAYMENT_STATUS_APPROVED,
+            ];
+        } else {
+            $dataToUpdate = [
+                'payment_session' => json_encode($sessionPaymentRequest),
+                'payment_date' => $sessionPaymentRequest->status->status ?
+                new Carbon($sessionPaymentRequest->status->date) : null,
+                'payment_status' => Order::PAYMENT_STATUS_ERROR,
+            ];
+        }
+
+        $order->update($dataToUpdate);
     }
 }
