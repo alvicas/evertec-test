@@ -5,6 +5,7 @@ namespace App\Traits;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 trait ConsumesExternalServices
@@ -64,7 +65,6 @@ trait ConsumesExternalServices
     {
         $method = strtoupper($method);
         $this->setParameters($method, $headersData, $body, $auth, $verify);
-        dd($this->parameters,$url);
         try {
             $client = new Client;
             $response = $client->request($method, $url, $this->parameters);
@@ -78,16 +78,20 @@ trait ConsumesExternalServices
             ->log("request success from $serviceName");
             
             return $responseContent;
-        } catch (Exception $exception) {
+
+        } catch (ClientException $e) {
+
+            $response = $e->getResponse();
+            $responseBodyAsString = $response->getBody()->getContents();
 
             activity()
             ->withProperties([
                 'request' => $this->parameters,
-                'response' => $exception->getMessage()
+                'response' => $responseBodyAsString
             ])
             ->log("request error from $serviceName");
 
-            return $exception;
+            return json_decode($responseBodyAsString);
         }
     }
 

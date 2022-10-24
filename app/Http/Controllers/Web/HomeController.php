@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Web\Product;
+namespace App\Http\Controllers\Web;
 
 use App\Models\Product;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 
-class ProductIndexController extends Controller
+class HomeController extends Controller
 {
     /**
      * product
@@ -26,17 +26,17 @@ class ProductIndexController extends Controller
     }
 
     /**
-     * index function
+     * Undocumented function
      *
      * @return void
      */
-    public function index()
+    public function home()
     {
         try {
-            return  $this->successResponse($this->product->getProductsPaginated());
+            $products = $this->product->all();
+            return view('home', compact('products'));
         } catch (\Exception $exception) {
             return $this->errorResponse($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }

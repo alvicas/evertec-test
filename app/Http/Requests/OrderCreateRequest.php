@@ -30,7 +30,7 @@ class OrderCreateRequest extends FormRequest
             'customer_mobile' => 'required|string|max:40',
             'customer_document_number' => 'required|string|max:20',
             'customer_document_type' => 'required|string|max:5',
-            'total' => 'required|integer'
+            'total' => 'required'
         ];
     }
 }
